@@ -1,0 +1,81 @@
+.App {
+  min-height: 100vh;
+  background: linear-gradient(120deg, #e3f2fd 0%, #ffffff 100%);
+}
+
+.dashboard-container {
+  min-height: 100vh;
+  background: none;
+}
+
+.navbar {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+  border-radius: 0 0 18px 18px;
+}
+
+.sidebar-gradient {
+  background: linear-gradient(135deg, #74C0FC 0%, #1976d2 100%);
+  color: white;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(116,192,252,0.10);
+}
+
+.sidebar-gradient .nav-item {
+  margin: 16px 0;
+  font-size: 1.12rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-gradient .nav-item i {
+  font-size: 1.2em;
+}
+
+.card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  border: none;
+}
+
+.card-title {
+  font-weight: 700;
+  color: #1976d2;
+}
+
+.hero-section {
+  background: linear-gradient(90deg, #74C0FC 0%, #1976d2 100%);
+  color: white;
+  border-radius: 18px;
+  padding: 2.5rem 2rem 2rem 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 32px rgba(116,192,252,0.10);
+}
+
+.hero-section h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+}
+
+.hero-section p {
+  font-size: 1.15rem;
+}
+
+@media (max-width: 767px) {
+  .sidebar-gradient {
+    margin-bottom: 1.5rem;
+  }
+  .hero-section {
+    padding: 1.2rem 1rem 1.4rem 1rem;
+  }
+}
+
+/* Utility for icons (FontAwesome via CDN) */
+.fa {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
