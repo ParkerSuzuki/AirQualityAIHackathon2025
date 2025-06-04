@@ -111,11 +111,7 @@ function ContactForm() {
             </div>
           </form>
         )}
-        
-        <div className="text-muted mt-3" style={{fontSize: "0.9rem"}}>
-          <i className="fa-solid fa-shield-halved me-1"></i>
-          We respect your privacy and will never share your information.
-        </div>
+  
       </div>
     </div>
   );

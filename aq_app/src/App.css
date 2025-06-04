@@ -70,6 +70,28 @@
   }
 }
 
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 24px;
+  width: 100%;
+  max-width: none;
+  margin: 0 0 32px 0;
+  padding: 0 16px;
+}
+
+.dashboard-grid .grid-item {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+  }
+}
+
 /* Utility for icons (FontAwesome via CDN) */
 .fa {
   display: inline-block;
