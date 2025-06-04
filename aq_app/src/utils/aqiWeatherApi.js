@@ -3,7 +3,7 @@
 
 import { SLC_CITY, SLC_COORDS } from './constants';
 
-export async function fetchAqiAndWeather(city = SLC_CITY, apiKey) {
+export async function fetchAqiAndWeather(cityOrCoords = SLC_CITY, apiKey) {
   if (!apiKey) {
     // Fallback sample data
     return {
@@ -23,11 +23,28 @@ export async function fetchAqiAndWeather(city = SLC_CITY, apiKey) {
       ]
     };
   }
-  const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}`;
-  const weatherRes = await fetch(weatherUrl);
-  if (!weatherRes.ok) throw new Error("Failed to fetch weather data");
-  const weatherData = await weatherRes.json();
-  const { lat, lon } = weatherData.coord;
+
+  let lat, lon;
+  let weatherData;
+
+  // If cityOrCoords is an object with lat/lng|lon, use coordinates directly
+  if (typeof cityOrCoords === 'object' && cityOrCoords !== null && 'lat' in cityOrCoords && ('lon' in cityOrCoords || 'lng' in cityOrCoords)) {
+    lat = cityOrCoords.lat;
+    lon = cityOrCoords.lon !== undefined ? cityOrCoords.lon : cityOrCoords.lng;
+    // Fetch weather data by coordinates
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+    const weatherRes = await fetch(weatherUrl);
+    if (!weatherRes.ok) throw new Error("Failed to fetch weather data");
+    weatherData = await weatherRes.json();
+  } else {
+    // Fallback to city string
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(cityOrCoords)}&appid=${apiKey}`;
+    const weatherRes = await fetch(weatherUrl);
+    if (!weatherRes.ok) throw new Error("Failed to fetch weather data");
+    weatherData = await weatherRes.json();
+    lat = weatherData.coord.lat;
+    lon = weatherData.coord.lon;
+  }
 
   // AQI forecast
   const aqiForecastUrl = `https://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`;

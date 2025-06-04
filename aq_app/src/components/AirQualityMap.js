@@ -1,9 +1,9 @@
-import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from 'react';
 import { fetchAqiAndWeather } from '../utils/aqiWeatherApi';
-import { SLC_CITY, SLC_COORDS } from '../utils/constants';
+import { SLC_CITY, SLC_COORDS, SLC_BORDER } from '../utils/constants';
 
 // Fix Leaflet icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -13,9 +13,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-function AirQualityMap() {
-  // Salt Lake City coordinates
-  const slc = SLC_COORDS;
+function AirQualityMap({ city = SLC_CITY, center = SLC_COORDS, border = SLC_BORDER, coords }) {
   const [aqi, setAqi] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,9 +21,9 @@ function AirQualityMap() {
   useEffect(() => {
     const apiKey = process.env.REACT_APP_OWM_API_KEY;
     setLoading(true);
-    fetchAqiAndWeather(SLC_CITY, apiKey)
+    const fetchArg = coords ? coords : city;
+    fetchAqiAndWeather(fetchArg, apiKey)
       .then(({ aqiData }) => {
-        // Use the first available AQI value for today
         const today = new Date().toISOString().slice(0, 10);
         const todayAqi = aqiData && aqiData.length > 0
           ? aqiData.find(d => d.date === today)?.aqi || aqiData[0].aqi
@@ -38,7 +36,7 @@ function AirQualityMap() {
         setError(err.message || 'Could not fetch AQI data.');
         setLoading(false);
       });
-  }, []);
+  }, [city, coords]);
 
   let circleColor = '#43cea2';
   if (aqi > 100) circleColor = '#d32f2f';
@@ -51,18 +49,17 @@ function AirQualityMap() {
       ) : error ? (
         <div style={{color: 'red', textAlign: 'center', padding: '2rem'}}>{error}</div>
       ) : (
-        <MapContainer center={slc} zoom={11} style={{ height: '100%', width: '100%', borderRadius: '18px' }}>
+        <MapContainer center={center} zoom={11} style={{ height: '100%', width: '100%', borderRadius: '18px' }}>
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <Circle
-            center={slc}
-            radius={4000}
-            pathOptions={{ color: circleColor, fillOpacity: 0.4 }}
+          <Polygon
+            positions={border}
+            pathOptions={{ color: circleColor, fillOpacity: 0.2 }}
           />
-          <Marker position={slc}>
+          <Marker position={center}>
             <Popup>
-              Salt Lake City<br />AQI: {aqi}
+              {city}<br />AQI: {aqi}
             </Popup>
           </Marker>
         </MapContainer>
