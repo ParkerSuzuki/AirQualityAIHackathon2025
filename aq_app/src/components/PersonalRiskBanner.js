@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { calculatePersonalRisk } from "../utils/personalRiskUtil";
+import { calculatePersonalRisk, calculateCompositeScore } from "../utils/personalRiskUtil";
 
 export default function PersonalRiskBanner({ riskScore, aqi, show }) {
   if (!show) return null;
@@ -40,6 +40,9 @@ export default function PersonalRiskBanner({ riskScore, aqi, show }) {
           </div>
           <div style={{ fontSize: 20, fontWeight: 600, color: '#1976d2' }}>
             Current AQI: <span style={{ color: risk.color }}>{aqi !== null ? Math.round(aqi) : '--'}</span>
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 600, color: '#1976d2' }}>
+            Composite Risk Score: <span style={{ color: risk.color }}>{(aqi !== null && riskScore !== null) ? calculateCompositeScore(aqi, riskScore) : '--'}</span>
           </div>
           <div style={{ fontSize: 16, color: '#555', marginTop: 8, maxWidth: 440 }}>
             {risk.recommendation}

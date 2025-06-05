@@ -9,6 +9,7 @@ import CitySelector from './CitySelector';
 import { useState } from 'react';
 import About from './About';
 import PersonalRiskBanner from './PersonalRiskBanner';
+import { calculateCompositeScore } from '../utils/personalRiskUtil';
 
 import { CITIES } from '../utils/constants';
 
@@ -25,11 +26,18 @@ function Dashboard() {
 
   // Find the selected city from the CITIES array, fallback to SLC if not found
   const cityObj = CITIES.find(c => c.name === selectedCity) || CITIES[0];
+  // Calculate composite AQI if risk assessment is complete
+  const todayAqi = aqiData && aqiData.length > 0 ? aqiData[0].aqi : null;
+  const compositeAqi = (riskAssessmentComplete && todayAqi !== null && riskScore !== null)
+    ? calculateCompositeScore(todayAqi, riskScore, 50, 100, 0.5) // adjust maxes/weight if needed
+    : todayAqi;
+
   const cityProps = {
     city: cityObj.name, // For display
     center: cityObj.center,
     border: cityObj.border,
     coords: cityObj.center, // Pass lat/lng for AQI fetch
+    compositeAqi // Pass to map
   };
 
   useEffect(() => {
@@ -75,6 +83,7 @@ function Dashboard() {
             loading={loading}
             error={error}
             city={cityObj.name}
+            riskScore={riskScore}
           />
         </div>
         <div className="grid-item contact" style={{height: 300}}>

@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { getCityAqiForecast } from "../utils/cityCsvAqiUtil";
 
-import { aqiCategory } from '../utils/personalRiskUtil';
+import { aqiCategory, calculateCompositeScore } from '../utils/personalRiskUtil';
 
-function WeatherComponent({ aqiData: propAqiData, city, loading: propLoading, error: propError }) {
+function WeatherComponent({ aqiData: propAqiData, city, loading: propLoading, error: propError, riskScore }) {
   // Debug logging
   console.log('[AirQualityChart] Render for city:', city);
   console.log('[AirQualityChart] aqiData:', propAqiData);
@@ -75,16 +75,19 @@ function WeatherComponent({ aqiData: propAqiData, city, loading: propLoading, er
         </h4>
         <div className="d-flex justify-content-center align-items-end gap-3 w-100 flex-nowrap" style={{overflowX: isLong ? 'auto' : 'visible', minHeight: 160}}>
           {aqiData.slice(0, 10).map((day, idx) => {
-            console.log(`[AirQualityChart] Day ${idx}:`, day);
-            const cat = aqiCategory(day.aqi);
+            // If riskScore is provided, use composite score for each day
+            const value = (riskScore !== undefined && riskScore !== null)
+              ? calculateCompositeScore(day.aqi, riskScore)
+              : day.aqi;
+            const cat = aqiCategory(value);
             return (
               <div key={idx} className="text-center bg-white" style={{ width: isLong ? 68 : 92, height: 200, borderRadius: 12, boxShadow: '0 2px 12px rgba(116,192,252,0.10)', padding: '10px 6px', margin: '0 2px', border: '1.5px solid #f1f6fa', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', transition: 'box-shadow 0.2s', cursor: 'default' }}>
-                <div style={{ fontWeight: 600, color: '#1976d2', fontSize: isLong ? 15 : 18, marginBottom: 2 }}>{day.label}</div>
+                <div style={{ fontWeight: 600, color: '#1976d2', fontSize: isLong ? 15 : 18, marginBottom: 2 }}>{day.label}{riskScore !== undefined && riskScore !== null && <span style={{fontSize: 12, color: '#d32f2f', marginLeft: 4}} title="Personalized">*</span>}</div>
                 <div style={{ fontSize: isLong ? 32 : 44, margin: isLong ? '4px 0' : '8px 0', color: cat.color, textShadow: '0 2px 8px #e3f2fd' }}>
                   <i className="fa-solid fa-wind"></i>
                 </div>
                 <div style={{ fontSize: isLong ? 18 : 26, fontWeight: 700, color: '#222', marginBottom: isLong ? 1 : 2 }}>
-                  {Math.round(day.aqi)}
+                  {Math.round(value)}
                 </div>
                 <div style={{ fontSize: isLong ? 13 : 15, color: '#888', minHeight: isLong ? 18 : 20, fontWeight: 400 }}>{cat.desc}</div>
                 {day.alert && day.alert !== "NO" && (

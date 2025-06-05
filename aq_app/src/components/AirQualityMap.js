@@ -14,8 +14,10 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-function AirQualityMap({ city = SLC_CITY, center = SLC_COORDS, border = SLC_BORDER, coords, containerHeight }) {
+function AirQualityMap({ city = SLC_CITY, center = SLC_COORDS, border = SLC_BORDER, coords, containerHeight, compositeAqi }) {
   const [aqi, setAqi] = useState(null);
+  // Use compositeAqi if provided (personalized risk)
+  const displayAqi = compositeAqi !== undefined && compositeAqi !== null ? compositeAqi : aqi;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -35,7 +37,7 @@ function AirQualityMap({ city = SLC_CITY, center = SLC_COORDS, border = SLC_BORD
       });
   }, [city]);
 
-  const { color: circleColor } = aqiCategory(aqi);
+  const { color: circleColor } = aqiCategory(displayAqi);
 
   const mapHeight = containerHeight || 350;
   return (
@@ -57,7 +59,7 @@ function AirQualityMap({ city = SLC_CITY, center = SLC_COORDS, border = SLC_BORD
             <Popup>
               <div style={{textAlign: 'center'}}>
                 <div style={{fontWeight: 600, fontSize: 18, color: circleColor}}>
-                  AQI: {aqi !== null ? Math.round(aqi) : '--'}
+                  AQI: {displayAqi !== null && displayAqi !== undefined ? Math.round(displayAqi) : '--'}
                 </div>
               </div>
             </Popup>
