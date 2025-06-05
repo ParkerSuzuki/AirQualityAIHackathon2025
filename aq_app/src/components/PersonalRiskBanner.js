@@ -2,10 +2,13 @@ import React from "react";
 import PropTypes from "prop-types";
 import { calculatePersonalRisk, calculateCompositeScore } from "../utils/personalRiskUtil";
 
+import { aqiCategory } from "../utils/personalRiskUtil";
+
 export default function PersonalRiskBanner({ riskScore, aqi, show }) {
   if (!show) return null;
-  // Use composite AQI for category color and info
-  const risk = calculatePersonalRisk(riskScore, aqi); // aqi is now compositeAqi
+  // Use composite AQI for banner color and info
+  const compositeAqi = aqi;
+  const category = aqiCategory(compositeAqi);
   return (
     <div className="card" style={{
       width: '100%',
@@ -25,28 +28,31 @@ export default function PersonalRiskBanner({ riskScore, aqi, show }) {
         minHeight: 100
       }}>
         <div className="d-flex align-items-center mb-3 mb-md-0">
-          <i className="fa-solid fa-user-shield me-3" style={{ fontSize: 40, color: risk.color }}></i>
+          <i className="fa-solid fa-user-shield me-3" style={{ fontSize: 40, color: category.color }}></i>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 28, color: risk.color, letterSpacing: 0.2 }}>
+            <div style={{ fontWeight: 700, fontSize: 28, color: category.color, letterSpacing: 0.2 }}>
               Personal Air Quality Risk
             </div>
             <div style={{ fontSize: 18, color: '#222', fontWeight: 500 }}>
-              {risk.description}
+              {category.desc}
+            </div>
+            <div style={{ fontSize: 15, color: category.color, fontWeight: 500 }}>
+              Composite AQI: {compositeAqi !== null && compositeAqi !== undefined ? Math.round(compositeAqi) : '--'}
             </div>
           </div>
         </div>
         <div className="text-center mt-3 mt-md-0">
           <div style={{ fontSize: 20, fontWeight: 600, color: '#1976d2' }}>
-            Your Risk Score: <span style={{ color: risk.color }}>{riskScore}</span>
+            Your Risk Score: <span style={{ color: category.color }}>{riskScore}</span>
           </div>
           <div style={{ fontSize: 20, fontWeight: 600, color: '#1976d2' }}>
-            Current AQI: <span style={{ color: risk.color }}>{aqi !== null ? Math.round(aqi) : '--'}</span>
+            Current AQI: <span style={{ color: category.color }}>{aqi !== null ? Math.round(aqi) : '--'}</span>
           </div>
           <div style={{ fontSize: 20, fontWeight: 600, color: '#1976d2' }}>
-            Composite Risk Score: <span style={{ color: risk.color }}>{(aqi !== null && riskScore !== null) ? calculateCompositeScore(aqi, riskScore) : '--'}</span>
+            Composite Risk Score: <span style={{ color: category.color }}>{(aqi !== null && riskScore !== null) ? calculateCompositeScore(aqi, riskScore) : '--'}</span>
           </div>
-          <div style={{ fontSize: 16, color: '#555', marginTop: 8, maxWidth: 440 }}>
-            {risk.recommendation}
+          <div style={{ fontSize: 16, color: category.color, marginTop: 8, maxWidth: 440 }}>
+            {category.recommendation}
           </div>
         </div>
       </div>
