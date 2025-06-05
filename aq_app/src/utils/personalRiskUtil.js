@@ -1,7 +1,7 @@
 /**
  * Calculate a user's personal air quality risk based on their riskScore and the current AQI.
  * @param {number} riskScore - User's risk score (e.g., from health form, 0-100 or 1-10 scale)
- * @param {number} aqi - Air Quality Index value (EPA scale, 0-500)
+ * @param {number} aqi - Air Quality Index value (EPA scale, 0-50, or composite 0-100)
  * @returns {object} { level, description, color, recommendation }
  */
 // EPA AQI category utility

@@ -4,7 +4,8 @@ import { calculatePersonalRisk, calculateCompositeScore } from "../utils/persona
 
 export default function PersonalRiskBanner({ riskScore, aqi, show }) {
   if (!show) return null;
-  const risk = calculatePersonalRisk(riskScore, aqi);
+  // Use composite AQI for category color and info
+  const risk = calculatePersonalRisk(riskScore, aqi); // aqi is now compositeAqi
   return (
     <div className="card" style={{
       width: '100%',

@@ -56,7 +56,7 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <div className="hero-section mb-0 text-center" style={{marginBottom: 0}}>
+      <div className="hero-section mb-0 text-center" style={{marginBottom: 12}}>
         <h2 className="mb-2" style={{color: '#1976d2'}}><i className="fa-solid fa-wind me-2"></i>BreathSafe Dashboard</h2>
         <CitySelector selectedCity={selectedCity} onChange={setSelectedCity} />
       </div>
@@ -64,7 +64,7 @@ function Dashboard() {
       {riskAssessmentComplete && riskScore !== null && aqiData && aqiData.length > 0 && (
         <PersonalRiskBanner 
           riskScore={riskScore} 
-          aqi={aqiData[0].aqi} 
+          aqi={compositeAqi} 
           show={true}
           style={{marginTop: 0, marginBottom: 0}}
         />
