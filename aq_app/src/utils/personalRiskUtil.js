@@ -6,18 +6,19 @@
  */
 // EPA AQI category utility
 export function aqiCategory(aqi) {
-  if (aqi <= 10) return { level: 1, desc: "Good", color: "#43cea2", recommendation: "Air quality is good. Enjoy outdoor activities." };
-  if (aqi <= 20) return { level: 2, desc: "Moderate", color: "#74C0FC", recommendation: "Air quality is acceptable, but unusually sensitive people should consider limiting prolonged outdoor exertion." };
-  if (aqi <= 30) return { level: 3, desc: "Unhealthy for Sensitive Groups", color: "#ffa726", recommendation: "Sensitive groups and high risk individuals should limit time outdoors." };
-  if (aqi <= 40) return { level: 4, desc: "Unhealthy", color: "#f57c00", recommendation: "Sensitive groups and those with high risk should stay indoors." };
-  if (aqi <= 50) return { level: 5, desc: "Very Unhealthy", color: "#d32f2f", recommendation: "Everyone should avoid outdoor exertion." };
+  if (aqi <= 20) return { level: 1, desc: "Good", color: "#43cea2", recommendation: "Air quality is good. Enjoy outdoor activities." };
+  if (aqi <= 40) return { level: 2, desc: "Moderate", color: "#74C0FC", recommendation: "Air quality is acceptable, but unusually sensitive people should consider limiting prolonged outdoor exertion." };
+  if (aqi <= 60) return { level: 3, desc: "Unhealthy for Sensitive Groups", color: "#ffa726", recommendation: "Sensitive groups and high risk individuals should limit time outdoors." };
+  if (aqi <= 75) return { level: 4, desc: "Unhealthy", color: "#f57c00", recommendation: "Sensitive groups and those with high risk should stay indoors." };
+  if (aqi <= 100) return { level: 5, desc: "Very Unhealthy", color: "#d32f2f", recommendation: "Everyone should avoid outdoor exertion." };
   return { level: 6, desc: "Hazardous", color: "#7e0023", recommendation: "Avoid all outdoor activity. Stay indoors with air filtration." };
 }
 
 // Composite score utility: combines AQI and riskScore into a 0-100 score
-export function calculateCompositeScore(aqi, riskScore, aqiMax = 50, riskMax = 100, aqiWeight = 0.5) {
+export function calculateCompositeScore(aqi, riskScore, aqiMax = 100, riskMax = 100, aqiWeight = 0.5) {
   const normAqi = Math.min(1, aqi / aqiMax);
-  const normRisk = Math.min(1, riskScore / riskMax);
+  // INVERT riskScore: high score = healthy (good), so invert for risk
+  const normRisk = 1 - Math.min(1, riskScore / riskMax);
   const composite = aqiWeight * normAqi + (1 - aqiWeight) * normRisk;
   return Math.round(composite * 100); // 0–100 scale
 }

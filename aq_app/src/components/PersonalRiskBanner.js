@@ -4,11 +4,10 @@ import { calculatePersonalRisk, calculateCompositeScore } from "../utils/persona
 
 import { aqiCategory } from "../utils/personalRiskUtil";
 
-export default function PersonalRiskBanner({ riskScore, aqi, show }) {
+export default function PersonalRiskBanner({ riskScore, aqi, currentAqi, show }) {
   if (!show) return null;
-  // Use composite AQI for banner color and info
-  const compositeAqi = aqi;
-  const category = aqiCategory(compositeAqi);
+  // Use the provided composite AQI directly
+  const category = aqiCategory(aqi);
   return (
     <div className="card" style={{
       width: '100%',
@@ -36,9 +35,6 @@ export default function PersonalRiskBanner({ riskScore, aqi, show }) {
             <div style={{ fontSize: 18, color: '#222', fontWeight: 500 }}>
               {category.desc}
             </div>
-            <div style={{ fontSize: 15, color: category.color, fontWeight: 500 }}>
-              Composite AQI: {compositeAqi !== null && compositeAqi !== undefined ? Math.round(compositeAqi) : '--'}
-            </div>
           </div>
         </div>
         <div className="text-center mt-3 mt-md-0">
@@ -46,11 +42,12 @@ export default function PersonalRiskBanner({ riskScore, aqi, show }) {
             Your Risk Score: <span style={{ color: category.color }}>{riskScore}</span>
           </div>
           <div style={{ fontSize: 20, fontWeight: 600, color: '#1976d2' }}>
-            Current AQI: <span style={{ color: category.color }}>{aqi !== null ? Math.round(aqi) : '--'}</span>
+            Current AQI: <span style={{ color: category.color }}>{currentAqi !== null && currentAqi !== undefined ? Math.round(currentAqi) : '--'}</span>
           </div>
           <div style={{ fontSize: 20, fontWeight: 600, color: '#1976d2' }}>
-            Composite Risk Score: <span style={{ color: category.color }}>{(aqi !== null && riskScore !== null) ? calculateCompositeScore(aqi, riskScore) : '--'}</span>
+            Composite AQI: <span style={{ color: category.color }}>{aqi !== null && aqi !== undefined ? Math.round(aqi) : '--'}</span>
           </div>
+          {/* Composite Risk Score is the same as Composite AQI, so we can omit or show just Composite AQI above */}
           <div style={{ fontSize: 16, color: category.color, marginTop: 8, maxWidth: 440 }}>
             {category.recommendation}
           </div>
@@ -62,6 +59,7 @@ export default function PersonalRiskBanner({ riskScore, aqi, show }) {
 
 PersonalRiskBanner.propTypes = {
   riskScore: PropTypes.number.isRequired,
-  aqi: PropTypes.number.isRequired,
+  aqi: PropTypes.number.isRequired, // composite AQI
+  currentAqi: PropTypes.number, // current AQI
   show: PropTypes.bool.isRequired
 };

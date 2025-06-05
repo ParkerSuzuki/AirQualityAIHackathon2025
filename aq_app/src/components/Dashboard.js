@@ -28,9 +28,16 @@ function Dashboard() {
   const cityObj = CITIES.find(c => c.name === selectedCity) || CITIES[0];
   // Calculate composite AQI if risk assessment is complete
   const todayAqi = aqiData && aqiData.length > 0 ? aqiData[0].aqi : null;
-  const compositeAqi = (riskAssessmentComplete && todayAqi !== null && riskScore !== null)
-    ? calculateCompositeScore(todayAqi, riskScore, 50, 100, 0.5) // adjust maxes/weight if needed
-    : todayAqi;
+  const [compositeAqi, setCompositeAqi] = useState(todayAqi);
+
+  // Recalculate compositeAqi whenever dependencies change
+  useEffect(() => {
+    if (riskAssessmentComplete && todayAqi !== null && riskScore !== null) {
+      setCompositeAqi(calculateCompositeScore(todayAqi, riskScore, 50, 100, 0.5));
+    } else {
+      setCompositeAqi(todayAqi);
+    }
+  }, [todayAqi, riskAssessmentComplete, riskScore]);
 
   const cityProps = {
     city: cityObj.name, // For display
@@ -65,6 +72,7 @@ function Dashboard() {
         <PersonalRiskBanner 
           riskScore={riskScore} 
           aqi={compositeAqi} 
+          currentAqi={todayAqi}
           show={true}
           style={{marginTop: 0, marginBottom: 0}}
         />
