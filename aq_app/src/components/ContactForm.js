@@ -3,6 +3,7 @@ import { registerForNotifications } from '../utils/notificationApi';
 
 function ContactForm({ riskAssessmentComplete, riskScore }) {
   const [contactInfo, setContactInfo] = useState('');
+  const [phone, setPhone] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -10,13 +11,19 @@ function ContactForm({ riskAssessmentComplete, riskScore }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Basic validation
-    if (!contactInfo) {
-      setError('Please enter your contact information');
+    // Require at least one contact method
+    if (!contactInfo && !phone) {
+      setError('Please enter your email address or phone number');
       return;
     }
-
-    if (!contactInfo.includes('@')) {
+    // If email provided, validate format
+    if (contactInfo && !contactInfo.includes('@')) {
       setError('Please enter a valid email address');
+      return;
+    }
+    // If phone provided, basic validation (10+ digits)
+    if (phone && !/^\d{10,}$/.test(phone.replace(/\D/g, ''))) {
+      setError('Please enter a valid phone number');
       return;
     }
 
@@ -25,9 +32,10 @@ function ContactForm({ riskAssessmentComplete, riskScore }) {
 
     try {
       console.log("Submitting email to notification API:", { email: contactInfo, riskScore });
-      await registerForNotifications({ email: contactInfo, riskScore });
+      await registerForNotifications({ email: contactInfo, phone, riskScore });
       setSubmitted(true);
       setContactInfo('');
+      setPhone('');
     } catch (err) {
       setError(err.message || 'Failed to register for notifications.');
     } finally {
@@ -67,11 +75,24 @@ function ContactForm({ riskAssessmentComplete, riskScore }) {
               </label>
               <input
                 type="email"
-                className={`form-control ${error ? 'is-invalid' : ''}`}
+                className={`form-control${error && !phone ? ' is-invalid' : ''}`}
                 id="contactInfo"
                 placeholder="you@example.com"
                 value={contactInfo}
                 onChange={(e) => setContactInfo(e.target.value)}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="phone" className="form-label">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                className={`form-control${error && !contactInfo ? ' is-invalid' : ''}`}
+                id="phone"
+                placeholder="(555) 123-4567"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
               />
               {error && <div className="invalid-feedback">{error}</div>}
             </div>

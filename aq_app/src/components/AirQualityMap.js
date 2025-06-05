@@ -16,16 +16,17 @@ L.Icon.Default.mergeOptions({
 
 function AirQualityMap({ city = SLC_CITY, center = SLC_COORDS, border = SLC_BORDER, coords, containerHeight, compositeAqi }) {
   const [aqi, setAqi] = useState(null);
-  // Use compositeAqi if provided (personalized risk)
-  const displayAqi = compositeAqi !== undefined && compositeAqi !== null ? compositeAqi : aqi;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Always use compositeAqi if provided
+  const displayAqi = compositeAqi !== undefined && compositeAqi !== null ? compositeAqi : aqi;
+
+  // Fetch AQI only when city changes
   useEffect(() => {
     setLoading(true);
     getCityAqiForecast(city)
       .then((aqiData) => {
-        // Use the first entry's AQI as today's AQI
         const todayAqi = aqiData && aqiData.length > 0 ? aqiData[0].aqi : null;
         setAqi(todayAqi);
         setLoading(false);
@@ -37,6 +38,7 @@ function AirQualityMap({ city = SLC_CITY, center = SLC_COORDS, border = SLC_BORD
       });
   }, [city]);
 
+  // Re-render color/info when compositeAqi changes
   const { color: circleColor } = aqiCategory(displayAqi);
 
   const mapHeight = containerHeight || 350;
@@ -59,7 +61,7 @@ function AirQualityMap({ city = SLC_CITY, center = SLC_COORDS, border = SLC_BORD
             <Popup>
               <div style={{textAlign: 'center'}}>
                 <div style={{fontWeight: 600, fontSize: 18, color: circleColor}}>
-                  AQI: {displayAqi !== null && displayAqi !== undefined ? Math.round(displayAqi) : '--'}
+                  {compositeAqi !== undefined && compositeAqi !== null ? 'Personalized AQI' : 'AQI'}: {displayAqi !== null && displayAqi !== undefined ? Math.round(displayAqi) : '--'}
                 </div>
               </div>
             </Popup>

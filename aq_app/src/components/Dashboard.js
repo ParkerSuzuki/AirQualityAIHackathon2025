@@ -28,9 +28,16 @@ function Dashboard() {
   const cityObj = CITIES.find(c => c.name === selectedCity) || CITIES[0];
   // Calculate composite AQI if risk assessment is complete
   const todayAqi = aqiData && aqiData.length > 0 ? aqiData[0].aqi : null;
-  const compositeAqi = (riskAssessmentComplete && todayAqi !== null && riskScore !== null)
-    ? calculateCompositeScore(todayAqi, riskScore, 50, 100, 0.5) // adjust maxes/weight if needed
-    : todayAqi;
+  const [compositeAqi, setCompositeAqi] = useState(todayAqi);
+
+  // Recalculate compositeAqi whenever dependencies change
+  useEffect(() => {
+    if (riskAssessmentComplete && todayAqi !== null && riskScore !== null) {
+      setCompositeAqi(calculateCompositeScore(todayAqi, riskScore, 50, 100, 0.5));
+    } else {
+      setCompositeAqi(todayAqi);
+    }
+  }, [todayAqi, riskAssessmentComplete, riskScore]);
 
   const cityProps = {
     city: cityObj.name, // For display
@@ -56,15 +63,16 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <div className="hero-section mb-0 text-center" style={{marginBottom: 0}}>
-        <h2 className="mb-2" style={{color: '#1976d2'}}><i className="fa-solid fa-wind me-2"></i>BreathSafe Dashboard</h2>
+      <div className="hero-section mb-0 text-center" style={{marginBottom: 12}}>
+        <h2 className="mb-2" style={{color: '#1976d2'}}><i className="fa-solid fa-wind me-2"></i>BreatheSafe Dashboard</h2>
         <CitySelector selectedCity={selectedCity} onChange={setSelectedCity} />
       </div>
       {/* Personal Risk Banner: show only when assessment is complete */}
       {riskAssessmentComplete && riskScore !== null && aqiData && aqiData.length > 0 && (
         <PersonalRiskBanner 
           riskScore={riskScore} 
-          aqi={aqiData[0].aqi} 
+          aqi={compositeAqi} 
+          currentAqi={todayAqi}
           show={true}
           style={{marginTop: 0, marginBottom: 0}}
         />
