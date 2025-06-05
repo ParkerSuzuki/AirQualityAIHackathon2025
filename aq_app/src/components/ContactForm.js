@@ -1,44 +1,41 @@
 import React, { useState } from 'react';
+import { registerForNotifications } from '../utils/notificationApi';
 
-function ContactForm() {
+function ContactForm({ riskAssessmentComplete, riskScore }) {
   const [contactInfo, setContactInfo] = useState('');
-  const [contactType, setContactType] = useState('email');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
     // Basic validation
     if (!contactInfo) {
       setError('Please enter your contact information');
       return;
     }
 
-    if (contactType === 'email' && !contactInfo.includes('@')) {
+    if (!contactInfo.includes('@')) {
       setError('Please enter a valid email address');
       return;
     }
 
-    if (contactType === 'phone' && !/^\d{10}$/.test(contactInfo.replace(/\D/g, ''))) {
-      setError('Please enter a valid 10-digit phone number');
-      return;
-    }
-
-    // Clear any previous errors
     setError('');
-    
-    // In a real app, you would send this to your backend
-    console.log('Contact info submitted:', { contactType, contactInfo });
-    
-    // Show success message
-    setSubmitted(true);
-    
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setSubmitted(false);
+    setLoading(true);
+
+    try {
+      console.log("Submitting email to notification API:", { email: contactInfo, riskScore });
+      await registerForNotifications({ email: contactInfo, riskScore });
+      setSubmitted(true);
       setContactInfo('');
-    }, 3000);
+    } catch (err) {
+      setError(err.message || 'Failed to register for notifications.');
+    } finally {
+      setLoading(false);
+      setTimeout(() => {
+        setSubmitted(false);
+      }, 3000);
+    }
   };
 
   return (
@@ -56,47 +53,23 @@ function ContactForm() {
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label className="form-label">How would you like to receive alerts?</label>
-              <div className="d-flex">
-                <div className="form-check me-3">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    name="contactType"
-                    id="emailOption"
-                    checked={contactType === 'email'}
-                    onChange={() => setContactType('email')}
-                  />
-                  <label className="form-check-label" htmlFor="emailOption">
-                    Email
-                  </label>
-                </div>
-                <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    name="contactType"
-                    id="phoneOption"
-                    checked={contactType === 'phone'}
-                    onChange={() => setContactType('phone')}
-                  />
-                  <label className="form-check-label" htmlFor="phoneOption">
-                    SMS
-                  </label>
-                </div>
+            {loading && (
+              <div className="mb-2 text-center">
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Submitting...
               </div>
-            </div>
+            )}
+
             
             <div className="mb-3">
               <label htmlFor="contactInfo" className="form-label">
-                {contactType === 'email' ? 'Email Address' : 'Phone Number'}
+                Email Address
               </label>
               <input
-                type={contactType === 'email' ? 'email' : 'tel'}
+                type="email"
                 className={`form-control ${error ? 'is-invalid' : ''}`}
                 id="contactInfo"
-                placeholder={contactType === 'email' ? 'you@example.com' : '(555) 555-5555'}
+                placeholder="you@example.com"
                 value={contactInfo}
                 onChange={(e) => setContactInfo(e.target.value)}
               />
@@ -104,11 +77,16 @@ function ContactForm() {
             </div>
             
             <div className="d-grid gap-2">
-              <button type="submit" className="btn btn-primary" style={{background: 'linear-gradient(135deg, #74C0FC 0%, #1976d2 100%)', borderColor: '#1976d2', padding: '10px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(116,192,252,0.3)'}}>
+              <button type="submit" className="btn btn-primary" style={{background: 'linear-gradient(135deg, #74C0FC 0%, #1976d2 100%)', borderColor: '#1976d2', padding: '10px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(116,192,252,0.3)'}} disabled={!riskAssessmentComplete}>
                 <i className="fa-solid fa-paper-plane me-2"></i>
                 Subscribe to Alerts
               </button>
             </div>
+            {!riskAssessmentComplete && (
+              <div className="alert alert-warning mt-2" style={{fontSize: '0.95rem'}}>
+                Please complete the Risk Assessment above before subscribing to alerts.
+              </div>
+            )}
           </form>
         )}
   

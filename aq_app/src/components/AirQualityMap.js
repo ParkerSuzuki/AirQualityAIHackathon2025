@@ -13,7 +13,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-function AirQualityMap({ city = SLC_CITY, center = SLC_COORDS, border = SLC_BORDER, coords }) {
+function AirQualityMap({ city = SLC_CITY, center = SLC_COORDS, border = SLC_BORDER, coords, containerHeight }) {
   const [aqi, setAqi] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -42,8 +42,9 @@ function AirQualityMap({ city = SLC_CITY, center = SLC_COORDS, border = SLC_BORD
   if (aqi > 100) circleColor = '#d32f2f';
   else if (aqi > 50) circleColor = '#ffa726';
 
+  const mapHeight = containerHeight || 350;
   return (
-    <div style={{ height: '350px', width: '100%', position: 'relative', zIndex: 0 }}>
+    <div style={{ height: mapHeight, width: '100%', position: 'relative', zIndex: 0 }}>
       {loading ? (
         <div style={{textAlign: 'center', padding: '2rem'}}>Loading AQI map...</div>
       ) : error ? (

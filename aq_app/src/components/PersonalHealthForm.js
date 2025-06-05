@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { calculateRiskScore } from './riskScore';
 import questions from './questions';
 
-function PersonalHealthForm() {
+function PersonalHealthForm({ setRiskAssessmentComplete, onRiskScoreChange, containerHeight }) {
   const [formData, setFormData] = useState({});
   const [step, setStep] = useState(0);
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -30,12 +30,14 @@ function PersonalHealthForm() {
     // Calculate risk score using utility
     const { rawScore, normalizedScore, invertedScore } = calculateRiskScore(formData);
     setScore(invertedScore);
+    if (onRiskScoreChange) onRiskScoreChange(invertedScore);
     let risk = 'Low';
     if (rawScore >= 8) risk = 'Very High';
     else if (rawScore >= 5) risk = 'High';
     else if (rawScore >= 3) risk = 'Moderate';
     setRiskLevel(risk);
     setFormSubmitted(true);
+    if (setRiskAssessmentComplete) setRiskAssessmentComplete(true);
   };
 
 
@@ -43,14 +45,17 @@ function PersonalHealthForm() {
     setFormSubmitted(false);
     setRiskLevel('');
     setScore(null);
+    if (onRiskScoreChange) onRiskScoreChange(null);
     setFormData({});
     setStep(0);
+    if (setRiskAssessmentComplete) setRiskAssessmentComplete(false);
   };
 
   const currentQ = questions[step];
 
+  const cardHeight = containerHeight || undefined;
   return (
-    <div className="card" style={{boxShadow: '0 4px 12px rgba(116,192,252,0.15)', borderRadius: '12px', border: 'none'}}>
+    <div className="card" style={{boxShadow: '0 4px 12px rgba(116,192,252,0.15)', borderRadius: '12px', border: 'none', height: cardHeight}}>
       <div className="card-body" style={{background: 'linear-gradient(to right, rgba(116,192,252,0.05), rgba(116,192,252,0.1))'}}>
         <h3 className="card-title text-center mb-4" style={{color: '#1976d2'}}>
           <i className="fa-solid fa-user-md me-2"></i>
