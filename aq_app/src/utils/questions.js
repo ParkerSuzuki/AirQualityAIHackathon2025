@@ -23,7 +23,7 @@ const questions = [
   },
   {
     name: 'hasLungCondition',
-    label: 'Do you have asthma or any other chronic lung condition?',
+    label: 'Do you have a history of asthma or any chronic lung condition?',
     type: 'radio',
     options: [
       { value: 'yes', label: 'Yes' },
@@ -33,7 +33,7 @@ const questions = [
   },
   {
     name: 'outdoorsMoreThanTwoHours',
-    label: 'Will you be outdoors for more than two hours?',
+    label: 'Do you typically spend more than two hours outdoors each day?',
     type: 'radio',
     options: [
       { value: 'yes', label: 'Yes' },
@@ -43,7 +43,7 @@ const questions = [
   },
   {
     name: 'isPregnant',
-    label: 'Are you pregnant?',
+    label: 'Are you currently pregnant or planning to become pregnant?',
     type: 'radio',
     options: [
       { value: 'yes', label: 'Yes' },
@@ -53,7 +53,7 @@ const questions = [
   },
   {
     name: 'hasHeartCondition',
-    label: 'Do you have heart disease, high blood pressure, or diabetes?',
+    label: 'Have you ever been diagnosed with heart disease, high blood pressure, or diabetes?',
     type: 'radio',
     options: [
       { value: 'yes', label: 'Yes' },
@@ -63,7 +63,7 @@ const questions = [
   },
   {
     name: 'activityIntensity',
-    label: 'How intense will your outdoor activity be?',
+    label: 'How intense is your typical outdoor activity?',
     type: 'radio',
     options: [
       { value: 'light', label: 'Light (walking)' },
@@ -74,7 +74,7 @@ const questions = [
   },
   {
     name: 'workSetting',
-    label: 'What is your typical work setting?',
+    label: 'What is your usual work setting?',
     type: 'radio',
     options: [
       { value: 'indoor-ac', label: 'Mostly indoor with A/C' },
@@ -85,7 +85,7 @@ const questions = [
   },
   {
     name: 'smokesOrVapes',
-    label: 'Do you smoke or vape?',
+    label: 'Do you regularly smoke or vape?',
     type: 'radio',
     options: [
       { value: 'yes', label: 'Yes' },
@@ -95,7 +95,7 @@ const questions = [
   },
   {
     name: 'hasAirPurifier',
-    label: 'Do you have an air purifier you can run?',
+    label: 'Do you have an air purifier you regularly use at home?',
     type: 'radio',
     options: [
       { value: 'yes', label: 'Yes' },
