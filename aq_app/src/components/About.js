@@ -11,9 +11,8 @@ export default function About() {
         width: "80vw",
         maxWidth: 1300,
         minWidth: 480,
-        margin: 0,
-        padding: 0,
-        alignSelf: "flex-start"
+        margin: "0 auto",
+        padding: 0
       }}
     >
       <div

@@ -8,10 +8,11 @@ import AirQualityChart from './AirQualityChart';
 import CitySelector from './CitySelector';
 import { useState } from 'react';
 import About from './About';
+import PersonalRiskBanner from './PersonalRiskBanner';
 
 import { CITIES } from '../utils/constants';
 
-import { fetchAqiAndWeather } from '../utils/aqiWeatherApi';
+import { getCityAqiForecast } from '../utils/cityCsvAqiUtil';
 import { useEffect } from 'react';
 
 function Dashboard() {
@@ -19,7 +20,6 @@ function Dashboard() {
   const [riskScore, setRiskScore] = useState(null);
   const [selectedCity, setSelectedCity] = useState('Salt Lake City');
   const [aqiData, setAqiData] = useState(null);
-  const [weatherForecast, setWeatherForecast] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -33,44 +33,51 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    const apiKey = process.env.REACT_APP_OWM_API_KEY;
     setLoading(true);
-    fetchAqiAndWeather(cityObj.center, apiKey)
-      .then(({ aqiData, weatherForecast }) => {
+    getCityAqiForecast(cityObj.name)
+      .then((aqiData) => {
         setAqiData(aqiData);
-        setWeatherForecast(weatherForecast);
         setLoading(false);
         setError(null);
       })
       .catch((err) => {
-        setError(err.message || 'Could not fetch AQI or weather data.');
+        setError(err.message || 'Could not fetch AQI data.');
         setLoading(false);
       });
   }, [selectedCity]);
 
   return (
     <div className="dashboard-container">
-      <div className="hero-section mb-4 text-center">
+      <div className="hero-section mb-0 text-center" style={{marginBottom: 0}}>
         <h2 className="mb-2" style={{color: '#1976d2'}}><i className="fa-solid fa-wind me-2"></i>BreathSafe Dashboard</h2>
         <CitySelector selectedCity={selectedCity} onChange={setSelectedCity} />
       </div>
-      <div className="dashboard-grid mb-4" style={{display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'stretch', gap: '24px'}}>
+      {/* Personal Risk Banner: show only when assessment is complete */}
+      {riskAssessmentComplete && riskScore !== null && aqiData && aqiData.length > 0 && (
+        <PersonalRiskBanner 
+          riskScore={riskScore} 
+          aqi={aqiData[0].aqi} 
+          show={true}
+          style={{marginTop: 0, marginBottom: 0}}
+        />
+      )}
+
+      <div className="dashboard-grid" style={{display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'stretch', gap: '24px'}}>
         <div className="grid-item map" style={{height: 420}}>
           <AirQualityMap {...cityProps} containerHeight={420} />
         </div>
         <div className="grid-item health" style={{height: 420}}>
           <PersonalHealthForm setRiskAssessmentComplete={setRiskAssessmentComplete} onRiskScoreChange={setRiskScore} containerHeight={420} />
         </div>
-        <div className="grid-item chart">
+        <div className="grid-item chart" style={{height: 300}}>
           <AirQualityChart 
             aqiData={aqiData} 
-            weatherForecast={weatherForecast}
             loading={loading}
             error={error}
             city={cityObj.name}
           />
         </div>
-        <div className="grid-item contact">
+        <div className="grid-item contact" style={{height: 300}}>
           <ContactForm riskAssessmentComplete={riskAssessmentComplete} riskScore={riskScore} />
         </div>
       </div>

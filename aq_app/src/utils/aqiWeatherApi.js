@@ -12,7 +12,12 @@ export async function fetchAqiAndWeather(cityOrCoords = SLC_CITY, apiKey) {
         { aqi: 3, label: "Tue", date: new Date() },
         { aqi: 4, label: "Wed", date: new Date() },
         { aqi: 3, label: "Thu", date: new Date() },
-        { aqi: 2, label: "Fri", date: new Date() }
+        { aqi: 2, label: "Fri", date: new Date() },
+        { aqi: 1, label: "Sat", date: new Date() },
+        { aqi: 2, label: "Sun", date: new Date() },
+        { aqi: 3, label: "Mon", date: new Date() },
+        { aqi: 4, label: "Tue", date: new Date() },
+        { aqi: 5, label: "Wed", date: new Date() }
       ],
       weatherForecast: [
         { label: "Mon", temp: 22, icon: "cloud", description: "partly cloudy" },
@@ -61,21 +66,18 @@ export async function fetchAqiAndWeather(cityOrCoords = SLC_CITY, apiKey) {
   const weatherForecastData = await forecastRes.json();
 
   // AQI grouping by day, max per day
-  const dailyAqi = {};
-  aqiForecastData.list.forEach((item) => {
+  const aqiForecast = aqiForecastData.list.map((item) => {
     const date = new Date(item.dt * 1000);
-    const dayKey = date.toLocaleDateString();
-    if (!dailyAqi[dayKey] || item.main.aqi > dailyAqi[dayKey].aqi) {
-      dailyAqi[dayKey] = {
-        aqi: item.main.aqi,
-        date,
-        label: date.toLocaleDateString(undefined, { month: "short", day: "numeric" })
-      };
-    }
+    return {
+      aqi: item.main.aqi,
+      label: date.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+      date,
+    };
   });
-  const aqiData = Object.values(dailyAqi)
-    .sort((a, b) => a.date - b.date)
-    .slice(0, 5);
+  // Only take the first 10 days (one per day)
+  const aqiData = aqiForecast.filter((item, idx, arr) =>
+    arr.findIndex(d => d.label === item.label) === idx
+  ).slice(0, 10);
 
   // Weather forecast grouping (closest to noon each day)
   const weatherByDay = {};
@@ -93,7 +95,7 @@ export async function fetchAqiAndWeather(cityOrCoords = SLC_CITY, apiKey) {
       };
     }
   });
-  const weatherForecast = Object.values(weatherByDay).slice(0, 5);
+  const weatherForecast = Object.values(weatherByDay).slice(0, 10);
   return { aqiData, weatherForecast };
 }
 

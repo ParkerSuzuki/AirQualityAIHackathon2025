@@ -41,7 +41,7 @@ function ContactForm({ riskAssessmentComplete, riskScore }) {
   return (
     <div className="card" style={{boxShadow: '0 4px 12px rgba(116,192,252,0.15)', borderRadius: '12px', border: 'none'}}>
       <div className="card-body" style={{background: 'linear-gradient(to right, rgba(116,192,252,0.05), rgba(116,192,252,0.1))'}}>
-        <h4 className="card-title mb-3 text-center" style={{color: '#1976d2'}}>
+        <h4 className="card-title mb-4 text-center" style={{color: '#1976d2', fontWeight: 700, fontSize: 26, letterSpacing: 0.2, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
           <i className="fa-solid fa-bell me-2"></i>
           Get Air Quality Alerts
         </h4>

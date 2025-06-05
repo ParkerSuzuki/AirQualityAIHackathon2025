@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { calculateRiskScore } from './riskScore';
-import questions from './questions';
+import { calculateRiskScore } from '../utils/riskScore';
+import questions from '../utils/questions';
 
 function PersonalHealthForm({ setRiskAssessmentComplete, onRiskScoreChange, containerHeight }) {
   const [formData, setFormData] = useState({});
@@ -63,64 +63,82 @@ function PersonalHealthForm({ setRiskAssessmentComplete, onRiskScoreChange, cont
         </h3>
         {formSubmitted ? (
           <div className="text-center">
-            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 12}}>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: 32,
+              flexWrap: 'wrap',
+              marginBottom: 12
+            }}>
               {/* SVG Circular Progress Ring */}
-              <svg width="180" height="180" style={{marginBottom: 12}}>
-                <circle
-                  cx="90"
-                  cy="90"
-                  r="74"
-                  stroke="#e0e0e0"
-                  strokeWidth="18"
-                  fill="none"
-                />
-                <circle
-                  cx="90"
-                  cy="90"
-                  r="74"
-                  stroke={score >= 70 ? '#43cea2' : score >= 40 ? '#ffa726' : '#d32f2f'}
-                  strokeWidth="18"
-                  fill="none"
-                  strokeDasharray={2 * Math.PI * 74}
-                  strokeDashoffset={2 * Math.PI * 74 * (1 - score / 100)}
-                  strokeLinecap="round"
-                  style={{transition: 'stroke-dashoffset 0.5s, stroke 0.5s'}}
-                  transform="rotate(-90 90 90)"
-                />
-                <text
-                  x="90"
-                  y="108"
-                  textAnchor="middle"
-                  fontSize="3.2rem"
-                  fill={score >= 70 ? '#43cea2' : score >= 40 ? '#ffa726' : '#d32f2f'}
-                  fontWeight="bold"
-                >
-                  {score}
-                </text>
-                <text
-                  x="90"
-                  y="136"
-                  textAnchor="middle"
-                  fontSize="1.4rem"
-                  fill="#1976d2"
-                >
-                  /100
-                </text>
-              </svg>
-            </div>
-            <div className={`alert ${riskLevel === 'Low' ? 'alert-success' : riskLevel === 'Moderate' ? 'alert-warning' : 'alert-danger'}`} 
-                 style={{maxWidth: '400px', margin: '0 auto', borderRadius: '8px'}}>
-              <h4 className="alert-heading">
-                <i className={`fa-solid ${riskLevel === 'Low' ? 'fa-check-circle' : riskLevel === 'Moderate' ? 'fa-exclamation-triangle' : 'fa-exclamation-circle'} me-2`}></i>
-                {riskLevel} Sensitivity Risk
-              </h4>
-              <p>Based on your responses, you have a <strong>{riskLevel.toLowerCase()}</strong> sensitivity to poor air quality. 
-                {riskLevel === 'Low' ? 
-                  ' You should still monitor air quality, but you are less likely to experience adverse effects from moderate air pollution.' :
-                  riskLevel === 'Moderate' ? 
-                  ' Consider limiting prolonged outdoor exertion when air quality is poor.' :
-                  ' You should take extra precautions and limit outdoor activities when air quality is poor.'}
-              </p>
+              <div style={{display: 'flex', justifyContent: 'center'}}>
+                <svg width="180" height="180">
+                  <circle
+                    cx="90"
+                    cy="90"
+                    r="74"
+                    stroke="#e0e0e0"
+                    strokeWidth="18"
+                    fill="none"
+                  />
+                  <circle
+                    cx="90"
+                    cy="90"
+                    r="74"
+                    stroke={score >= 70 ? '#43cea2' : score >= 40 ? '#ffa726' : '#d32f2f'}
+                    strokeWidth="18"
+                    fill="none"
+                    strokeDasharray={2 * Math.PI * 74}
+                    strokeDashoffset={2 * Math.PI * 74 * (1 - score / 100)}
+                    strokeLinecap="round"
+                    style={{transition: 'stroke-dashoffset 0.5s, stroke 0.5s'}}
+                    transform="rotate(-90 90 90)"
+                  />
+                  <text
+                    x="90"
+                    y="108"
+                    textAnchor="middle"
+                    fontSize="3.2rem"
+                    fill={score >= 70 ? '#43cea2' : score >= 40 ? '#ffa726' : '#d32f2f'}
+                    fontWeight="bold"
+                  >
+                    {score}
+                  </text>
+                  <text
+                    x="90"
+                    y="136"
+                    textAnchor="middle"
+                    fontSize="1.4rem"
+                    fill="#1976d2"
+                  >
+                    /100
+                  </text>
+                </svg>
+              </div>
+              <div className={`alert ${riskLevel === 'Low' ? 'alert-success' : riskLevel === 'Moderate' ? 'alert-warning' : 'alert-danger'}`} 
+                   style={{maxWidth: '220px', minWidth: '160px', margin: 0, borderRadius: '8px', fontSize: '0.97rem', padding: '12px 10px', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+                <h4 className="alert-heading" style={{fontSize: '1.1rem', marginBottom: 8}}>
+                  <i className={`fa-solid ${riskLevel === 'Low' ? 'fa-check-circle' : riskLevel === 'Moderate' ? 'fa-exclamation-triangle' : 'fa-exclamation-circle'} me-2`}></i>
+                  {riskLevel} Sensitivity Risk
+                </h4>
+                <p style={{fontSize: '0.95rem', marginBottom: 0}}>Based on your responses, you have a <strong>{riskLevel.toLowerCase()}</strong> sensitivity to poor air quality. 
+                  {riskLevel === 'Low' ? 
+                    ' You should still monitor air quality, but you are less likely to experience adverse effects from moderate air pollution.' :
+                    riskLevel === 'Moderate' ? 
+                    ' Consider limiting prolonged outdoor exertion when air quality is poor.' :
+                    ' You should take extra precautions and limit outdoor activities when air quality is poor.'}
+                </p>
+              </div>
+              <style>{`
+                @media (max-width: 600px) {
+                  .text-center > div[style*="display: flex"] {
+                    flex-direction: column !important;
+                    gap: 12px !important;
+                  }
+                }
+              `}</style>
             </div>
             <button 
               className="btn btn-outline-primary mt-4" 

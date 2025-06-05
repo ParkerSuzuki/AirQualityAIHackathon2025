@@ -2,7 +2,8 @@ import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from 'react';
-import { fetchAqiAndWeather } from '../utils/aqiWeatherApi';
+import { getCityAqiForecast } from '../utils/cityCsvAqiUtil';
+import { aqiCategory } from '../utils/personalRiskUtil';
 import { SLC_CITY, SLC_COORDS, SLC_BORDER } from '../utils/constants';
 
 // Fix Leaflet icon issue
@@ -19,15 +20,11 @@ function AirQualityMap({ city = SLC_CITY, center = SLC_COORDS, border = SLC_BORD
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const apiKey = process.env.REACT_APP_OWM_API_KEY;
     setLoading(true);
-    const fetchArg = coords ? coords : city;
-    fetchAqiAndWeather(fetchArg, apiKey)
-      .then(({ aqiData }) => {
-        const today = new Date().toISOString().slice(0, 10);
-        const todayAqi = aqiData && aqiData.length > 0
-          ? aqiData.find(d => d.date === today)?.aqi || aqiData[0].aqi
-          : null;
+    getCityAqiForecast(city)
+      .then((aqiData) => {
+        // Use the first entry's AQI as today's AQI
+        const todayAqi = aqiData && aqiData.length > 0 ? aqiData[0].aqi : null;
         setAqi(todayAqi);
         setLoading(false);
         setError(null);
@@ -36,11 +33,9 @@ function AirQualityMap({ city = SLC_CITY, center = SLC_COORDS, border = SLC_BORD
         setError(err.message || 'Could not fetch AQI data.');
         setLoading(false);
       });
-  }, [city, coords]);
+  }, [city]);
 
-  let circleColor = '#43cea2';
-  if (aqi > 100) circleColor = '#d32f2f';
-  else if (aqi > 50) circleColor = '#ffa726';
+  const { color: circleColor } = aqiCategory(aqi);
 
   const mapHeight = containerHeight || 350;
   return (
@@ -60,7 +55,11 @@ function AirQualityMap({ city = SLC_CITY, center = SLC_COORDS, border = SLC_BORD
           />
           <Marker position={center}>
             <Popup>
-              {city}<br />AQI: {aqi}
+              <div style={{textAlign: 'center'}}>
+                <div style={{fontWeight: 600, fontSize: 18, color: circleColor}}>
+                  AQI: {aqi !== null ? Math.round(aqi) : '--'}
+                </div>
+              </div>
             </Popup>
           </Marker>
         </MapContainer>
